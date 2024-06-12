@@ -139,8 +139,6 @@ class _HangmanGame extends State<HangmanGame> {
                         onPressed: tryGuessWord,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue.shade100,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0)),
                         ),
                         child: const Text("Try guess word",
                             style: TextStyle(color: Colors.indigo))),

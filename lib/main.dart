@@ -20,6 +20,13 @@ class MyApp extends StatelessWidget {
       create: (context) => GuessWordCubit(),
       child: MaterialApp(
         title: 'Hangman project',
+        theme: ThemeData(
+            scaffoldBackgroundColor: Colors.white,
+            elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.5)),
+                    elevation: 3))),
         home: BlocBuilder<GuessWordCubit, GuessWordState>(
           builder: (context, state) {
             if (state.guessWord == "") {
