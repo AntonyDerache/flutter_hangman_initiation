@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:hangman_game/example_click_counter.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hangman_game/cubit/cubit_observer.dart';
+import 'package:hangman_game/cubit/guess_word_cubit.dart';
+import 'package:hangman_game/cubit/guess_word_state.dart';
+import 'package:hangman_game/hangman/hangman_game.dart';
+import 'package:hangman_game/hangman/hangman_home.dart';
 
 void main() {
+  Bloc.observer = const CubitObserver();
   runApp(const MyApp());
 }
 
@@ -10,9 +16,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Hangman project',
-      home: ClickCounter(title: 'Hangman Game'),
+    return BlocProvider(
+      create: (context) => GuessWordCubit(),
+      child: MaterialApp(
+        title: 'Hangman project',
+        home: BlocBuilder<GuessWordCubit, GuessWordState>(
+          builder: (context, state) {
+            if (state.guessWord == "") {
+              return const HangmanHome();
+            } else {
+              return HangmanGame(guessWord: state.guessWord);
+            }
+          },
+        ),
+      ),
     );
   }
 }

@@ -4,15 +4,9 @@ Project to introduce people to flutter.
 
 ## Getting Started
 
-The main branch is a starting point for developers to pull the project.
+The main branch is a basic version 1 of the project with a functionnal game.
 
-Refer to the other branch for different step of the project
-
-### main branch
-
-Starting Point for the development
-
-## v1
+## version-1
 
 - Player can enter a word to guess
 
