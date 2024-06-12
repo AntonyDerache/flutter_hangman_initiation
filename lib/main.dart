@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hangman_game/example_click_counter.dart';
+import 'package:hangman_game/example/example_click_counter.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,9 +10,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'Hangman project',
-      home: ClickCounter(title: 'Hangman Game'),
+      theme: ThemeData(scaffoldBackgroundColor: Colors.white),
+      home: const ClickCounter(title: 'Hangman Game'),
     );
   }
 }

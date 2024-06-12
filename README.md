@@ -8,11 +8,11 @@ The main branch is a starting point for developers to pull the project.
 
 Refer to the other branch for different step of the project
 
-### main branch
+## main branch
 
 Starting Point for the development
 
-## v1
+## version-1
 
 - Player can enter a word to guess
 
