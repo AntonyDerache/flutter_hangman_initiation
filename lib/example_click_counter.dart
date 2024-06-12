@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class ClickCounter extends StatefulWidget {
+  const ClickCounter({super.key, required this.title});
 
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<ClickCounter> createState() => _ClickCounter();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _ClickCounter extends State<ClickCounter> {
   int _counter = 0;
 
   void _incrementCounter() {
@@ -22,7 +22,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Colors.blue.shade100,
         title: Text(widget.title),
       ),
       body: Center(

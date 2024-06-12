@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hangman_game/homepage.dart';
+import 'package:hangman_game/example_click_counter.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Hangman project',
-      home: MyHomePage(title: 'Hangman Home Page'),
+      home: ClickCounter(title: 'Hangman Game'),
     );
   }
 }
