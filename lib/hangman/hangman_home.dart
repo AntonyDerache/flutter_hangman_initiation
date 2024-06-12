@@ -37,9 +37,10 @@ class _HangmanHome extends State<HangmanHome> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text("Enter a guess word:"),
-              const SizedBox(height: 20),
-              TextField(controller: guessWordController),
-              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                child: TextField(controller: guessWordController),
+              ),
               ElevatedButton(
                   onPressed: () => submitGuessWord(),
                   child: const Text("Submit")),
