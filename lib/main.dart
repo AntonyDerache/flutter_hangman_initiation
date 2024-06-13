@@ -16,25 +16,30 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => GuessWordCubit(),
-      child: MaterialApp(
-        title: 'Hangman project',
-        theme: ThemeData(
-            scaffoldBackgroundColor: Colors.white,
-            elevatedButtonTheme: ElevatedButtonThemeData(
-                style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.5)),
-                    elevation: 3))),
-        home: BlocBuilder<GuessWordCubit, GuessWordState>(
-          builder: (context, state) {
-            if (state.guessWord == "") {
-              return const HangmanHome();
-            } else {
-              return const HangmanGame();
-            }
-          },
+    return MaterialApp(
+      title: 'Hangman project',
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.5),
+            ),
+            elevation: 3,
+          ),
+        ),
+      ),
+      home: BlocProvider(
+        create: (context) => GuessWordCubit(),
+        child: BlocBuilder<GuessWordCubit, GuessWordState>(
+          builder: (context, state) => Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.blue.shade100,
+              title: const Text("Hangman Game"),
+              centerTitle: true,
+            ),
+            body: state.guessWord.isEmpty ? const HangmanHome() : const HangmanGame(),
+          ),
         ),
       ),
     );

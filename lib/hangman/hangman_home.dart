@@ -24,28 +24,26 @@ class _HangmanHome extends State<HangmanHome> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.blue.shade100,
-          title: const Text("Hangman Game"),
-          centerTitle: true,
-        ),
-        body: SafeArea(
-            child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text("Enter a guess word:"),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: TextField(controller: guessWordController),
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("Enter a guess word:"),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: TextField(
+                controller: guessWordController,
               ),
-              ElevatedButton(
-                  onPressed: () => submitGuessWord(),
-                  child: const Text("Submit")),
-            ],
-          ),
-        )));
+            ),
+            ElevatedButton(
+              onPressed: submitGuessWord,
+              child: const Text("Submit"),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
