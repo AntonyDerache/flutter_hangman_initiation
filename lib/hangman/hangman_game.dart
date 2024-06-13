@@ -8,9 +8,9 @@ import 'package:hangman_game/hangman/dialogs/guess_word_dialog.dart';
 import 'package:hangman_game/types/guess_enum.dart';
 
 class HangmanGame extends StatefulWidget {
-  const HangmanGame({super.key, required this.guessWord});
+  const HangmanGame({super.key});
 
-  final String guessWord;
+  final int maxAttempt = 10;
 
   @override
   State<StatefulWidget> createState() => _HangmanGame();
@@ -27,17 +27,8 @@ class _HangmanGame extends State<HangmanGame> {
   }
 
   void hasReachMaximalAttempts() {
-    if (guessHistory.length == 10) {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return EndDialog(
-              endWord: context.read<GuessWordCubit>().state.guessWord,
-              isSuccess: false,
-            );
-          }).then((_) {
-        context.read<GuessWordCubit>().reset();
-      });
+    if (guessHistory.length == widget.maxAttempt) {
+      triggerEndGameModal(false);
     }
   }
 
@@ -46,10 +37,15 @@ class _HangmanGame extends State<HangmanGame> {
     String userInput = guessLetterController.text[0];
 
     guessLetterController.text = '';
-    if (context.read<GuessWordCubit>().tryGuessLetter(userInput) ==
-        GuessStateEnum.failed) {
-      guessHistory.add(userInput);
-      hasReachMaximalAttempts();
+    switch (context.read<GuessWordCubit>().tryGuessLetter(userInput)) {
+      case GuessStateEnum.failed:
+        guessHistory.add(userInput);
+        hasReachMaximalAttempts();
+        break;
+      case GuessStateEnum.wordFound:
+        triggerEndGameModal(true);
+      default:
+        break;
     }
     setState(() {/* The list guess history changed. */});
   }
@@ -63,16 +59,7 @@ class _HangmanGame extends State<HangmanGame> {
       if (result != null) {
         switch (context.read<GuessWordCubit>().tryGuessWord(result)) {
           case GuessStateEnum.wordFound:
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return EndDialog(
-                    endWord: context.read<GuessWordCubit>().state.guessWord,
-                    isSuccess: true,
-                  );
-                }).then((_) {
-              context.read<GuessWordCubit>().reset();
-            });
+            triggerEndGameModal(true);
             break;
           case GuessStateEnum.failed:
             guessHistory.add(result);
@@ -81,6 +68,19 @@ class _HangmanGame extends State<HangmanGame> {
         }
       }
       setState(() {/* The list guess history changed. */});
+    });
+  }
+
+  void triggerEndGameModal(bool isSuccess) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return EndDialog(
+            endWord: context.read<GuessWordCubit>().state.guessWord,
+            isSuccess: isSuccess,
+          );
+        }).then((_) {
+      context.read<GuessWordCubit>().reset();
     });
   }
 
@@ -100,7 +100,8 @@ class _HangmanGame extends State<HangmanGame> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               // Top part: Counter
-              HistoryCounter(guessHistory: guessHistory),
+              HistoryCounter(
+                  guessHistory: guessHistory, maxAttempt: widget.maxAttempt),
               // Bottom part: User input
               Column(children: [
                 // Hidden word

@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
             if (state.guessWord == "") {
               return const HangmanHome();
             } else {
-              return HangmanGame(guessWord: state.guessWord);
+              return const HangmanGame();
             }
           },
         ),

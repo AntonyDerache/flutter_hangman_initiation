@@ -27,6 +27,9 @@ class GuessWordCubit extends Cubit<GuessWordState> {
             state.hiddenWord, elem * 2, state.guessWord[elem]);
       }
       emit(state);
+      if (!state.hiddenWord.contains('_')) {
+        return GuessStateEnum.wordFound;
+      }
       return GuessStateEnum.letterFound;
     }
     return GuessStateEnum.failed;
