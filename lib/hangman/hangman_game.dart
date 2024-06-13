@@ -10,15 +10,12 @@ import 'package:hangman_game/types/guess_enum.dart';
 class HangmanGame extends StatefulWidget {
   const HangmanGame({super.key});
 
-  final int maxAttempt = 10;
-
   @override
   State<StatefulWidget> createState() => _HangmanGame();
 }
 
 class _HangmanGame extends State<HangmanGame> {
   final TextEditingController guessLetterController = TextEditingController();
-  List<String> guessHistory = List.empty(growable: true);
 
   @override
   void dispose() {
@@ -26,137 +23,141 @@ class _HangmanGame extends State<HangmanGame> {
     super.dispose();
   }
 
-  void hasReachMaximalAttempts() {
-    if (guessHistory.length == widget.maxAttempt) {
-      triggerEndGameModal(false);
-    }
-  }
-
   void tryGuessLetter() {
-    if (guessLetterController.text == '') return;
-    String userInput = guessLetterController.text[0];
-
+    if (guessLetterController.text.isEmpty) return;
+    context.read<GuessWordCubit>().tryGuessLetter(userInput);
     guessLetterController.text = '';
-    switch (context.read<GuessWordCubit>().tryGuessLetter(userInput)) {
-      case GuessStateEnum.failed:
-        guessHistory.add(userInput);
-        hasReachMaximalAttempts();
-        break;
-      case GuessStateEnum.wordFound:
-        triggerEndGameModal(true);
-      default:
-        break;
-    }
-    setState(() {/* The list guess history changed. */});
   }
+
+  String get userInput => guessLetterController.text.isEmpty ? '' : guessLetterController.text[0];
 
   void tryGuessWord() {
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return const GuessWordDialog();
-        }).then((result) {
+      context: context,
+      builder: (BuildContext context) {
+        return const GuessWordDialog();
+      },
+    ).then((result) {
       if (result != null) {
-        switch (context.read<GuessWordCubit>().tryGuessWord(result)) {
-          case GuessStateEnum.wordFound:
-            triggerEndGameModal(true);
-            break;
-          case GuessStateEnum.failed:
-            guessHistory.add(result);
-          default:
-            break;
-        }
+        context.read<GuessWordCubit>().tryGuessWord(result);
       }
-      setState(() {/* The list guess history changed. */});
     });
   }
 
   void triggerEndGameModal(bool isSuccess) {
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return EndDialog(
-            endWord: context.read<GuessWordCubit>().state.guessWord,
-            isSuccess: isSuccess,
-          );
-        }).then((_) {
-      context.read<GuessWordCubit>().reset();
-    });
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return EndDialog(
+          endWord: context.read<GuessWordCubit>().state.guessWord,
+          isSuccess: isSuccess,
+        );
+      },
+    ).then(
+      (_) {
+        context.read<GuessWordCubit>().reset();
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.blue.shade100,
-          title: const Text("Hangman Game",
-              style: TextStyle(color: Colors.indigo)),
-          centerTitle: true,
-        ),
-        body: SafeArea(
-            child: Padding(
+    return BlocListener<GuessWordCubit, GuessWordState>(
+      listener: (context, state) {
+        switch (state.guessState) {
+          case GuessStateEnum.wordFound:
+            triggerEndGameModal(true);
+            break;
+          case GuessStateEnum.lose:
+            triggerEndGameModal(false);
+            break;
+          default:
+            break;
+        }
+      },
+      child: SafeArea(
+        child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              // Top part: Counter
-              HistoryCounter(
-                  guessHistory: guessHistory, maxAttempt: widget.maxAttempt),
-              // Bottom part: User input
-              Column(children: [
-                // Hidden word
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // Top part: Counter
                 BlocBuilder<GuessWordCubit, GuessWordState>(
-                  builder: (context, state) {
-                    return Text(state.hiddenWord,
-                        style: const TextStyle(fontSize: 20));
-                  },
-                ),
-
-                // Input for letters
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  child: SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: TextField(
-                      controller: guessLetterController,
-                      maxLength: 1,
-                      onSubmitted: (value) => tryGuessLetter(),
-                      decoration: const InputDecoration(
-                          counterText: "",
-                          hintText: '...',
-                          border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)))),
-                    ),
+                  builder: (context, state) => HistoryCounter(
+                    guessHistory: state.guessHistory,
+                    maxAttempt: state.guessMaxAttempt,
                   ),
                 ),
-
-                // Submit buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                // Bottom part: User input
+                Column(
                   children: [
-                    ElevatedButton(
-                        onPressed: tryGuessWord,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue.shade100,
+                    // Hidden word
+                    BlocBuilder<GuessWordCubit, GuessWordState>(
+                      builder: (context, state) {
+                        return Text(
+                          state.hiddenWord,
+                          style: const TextStyle(fontSize: 20),
+                        );
+                      },
+                    ),
+
+                    // Input for letters
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: TextField(
+                          controller: guessLetterController,
+                          maxLength: 1,
+                          onSubmitted: (value) => tryGuessLetter(),
+                          decoration: const InputDecoration(
+                            counterText: "",
+                            hintText: '...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                            ),
+                          ),
                         ),
-                        child: const Text("Try guess word",
-                            style: TextStyle(color: Colors.indigo))),
-                    const SizedBox(width: 10),
+                      ),
+                    ),
+
+                    // Submit buttons
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: tryGuessWord,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue.shade100,
+                          ),
+                          child: const Text(
+                            "Try guess word",
+                            style: TextStyle(color: Colors.indigo),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: tryGuessLetter,
+                          child: const Text("Submit letter"),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
                     ElevatedButton(
-                        onPressed: tryGuessLetter,
-                        child: const Text("Submit letter")),
+                      onPressed: () => context.read<GuessWordCubit>().reset(),
+                      child: const Text("Quit"),
+                    ),
                   ],
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () => context.read<GuessWordCubit>().reset(),
-                  child: const Text("Quit"),
-                ),
-              ])
-            ],
+                )
+              ],
+            ),
           ),
-        )));
+        ),
+      ),
+    );
   }
 }
